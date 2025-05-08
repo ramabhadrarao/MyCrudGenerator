@@ -15,6 +15,7 @@ class CRUDGenerator {
         $this->uniqueKeys = $uniqueKeys;
     }
 
+
     public function generateFiles() {
         $this->generateManagePHP();
         $this->generateManageJS();
@@ -31,7 +32,7 @@ class CRUDGenerator {
         $content .= "}\n";
         $content .= "?>\n\n";
         
-        // Tabler UI card-based layout
+        // Tabler UI card-based layout - keeping your original structure
         $content .= "<div class='card'>\n";
         $content .= "    <div class='card-header'>\n";
         $content .= "        <h3 class='card-title'>Manage " . $this->formatTitle($this->tableName) . "</h3>\n";
@@ -49,7 +50,7 @@ class CRUDGenerator {
         $content .= "        <?php endif; ?>\n";
         $content .= "    </div>\n\n";
         
-        // Form card (hidden by default)
+        // Form card (hidden by default) - keeping your original structure
         $content .= "    <div id='{$this->tableName}-form' class='card' style='display: none;'>\n";
         $content .= "        <div class='card-header'>\n";
         $content .= "            <h3 id='form-title' class='card-title'>Add " . $this->formatTitle($this->tableName) . "</h3>\n";
@@ -101,9 +102,7 @@ class CRUDGenerator {
         $content .= "    </div>\n";
         $content .= "</div>\n\n";
         
-        // Scripts
-        $content .= "<script src='https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js'></script>\n";
-        $content .= "<script src='https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js'></script>\n";
+        // Scripts - remove duplicate jQuery and only include essential scripts
         $content .= "<script src='../js/manage_{$this->tableName}.js'></script>\n";
 
         file_put_contents("../pages/manage_{$this->tableName}.php", $content);
@@ -118,7 +117,7 @@ class CRUDGenerator {
         $tableNameCamelCase = ucfirst($this->tableName);
         $content = "$(document).ready(function() {\n";
         
-        // Initialize Select2 for foreign key dropdowns
+        // Initialize Select2 for foreign key dropdowns - keeping your original implementation
         foreach ($this->foreignKeys as $column => $foreignTable) {
             $content .= "    // Initialize Select2 for {$column}\n";
             $content .= "    $('#{$column}').select2({\n";
@@ -140,12 +139,28 @@ class CRUDGenerator {
             $content .= "            cache: true\n";
             $content .= "        },\n";
             $content .= "        placeholder: 'Select " . $this->formatTitle($foreignTable['table']) . "',\n";
-            $content .= "        allowClear: true,\n";
-            $content .= "        theme: 'bootstrap-5'\n";
+            $content .= "        allowClear: true\n";
             $content .= "    });\n\n";
         }
         
-        // Fetch function
+        // Add showNotification function for better user feedback
+        $content .= "    // Function to show notifications instead of alerts\n";
+        $content .= "    function showNotification(type, message) {\n";
+        $content .= "        // Check if Tabler's notification system is available\n";
+        $content .= "        if (typeof Notify !== 'undefined') {\n";
+        $content .= "            new Notify({\n";
+        $content .= "                status: type === 'error' ? 'danger' : 'success',\n";
+        $content .= "                title: type === 'error' ? 'Error' : 'Success',\n";
+        $content .= "                text: message,\n";
+        $content .= "                position: 'right'\n";
+        $content .= "            });\n";
+        $content .= "        } else {\n";
+        $content .= "            // Fallback to alert if Tabler's notification is not available\n";
+        $content .= "            alert(message);\n";
+        $content .= "        }\n";
+        $content .= "    }\n\n";
+        
+        // Fetch function - keeping your original implementation but adding empty state handling
         $content .= "    function fetch{$tableNameCamelCase}(search = '') {\n";
         $content .= "        $.ajax({\n";
         $content .= "            url: '../actions/actions_{$this->tableName}.php',\n";
@@ -154,6 +169,11 @@ class CRUDGenerator {
         $content .= "            success: function(response) {\n";
         $content .= "                const data = JSON.parse(response);\n";
         $content .= "                if (data.success) {\n";
+        $content .= "                    if (data.data.length === 0) {\n";
+        $content .= "                        // Show empty state when no records found\n";
+        $content .= "                        $('#{$this->tableName}-list').html('<div class=\"empty\"><div class=\"empty-img\"><svg xmlns=\"http://www.w3.org/2000/svg\" class=\"icon\" width=\"128\" height=\"128\" viewBox=\"0 0 24 24\" stroke-width=\"1\" stroke=\"currentColor\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0\" /><path d=\"M9 10l.01 0\" /><path d=\"M15 10l.01 0\" /><path d=\"M9.5 15.05a3.5 3.5 0 0 1 5 0\" /></svg></div><p class=\"empty-title\">No results found</p><p class=\"empty-subtitle text-muted\">Try adjusting your search or filter to find what you\\'re looking for.</p></div>');\n";
+        $content .= "                        return;\n";
+        $content .= "                    }\n";
         $content .= "                    let table = `<div class='table-responsive'>`;\n";
         $content .= "                    table += `<table class='table table-vcenter card-table'>`;\n";
         $content .= "                    table += `<thead><tr>`;\n";
@@ -215,33 +235,43 @@ class CRUDGenerator {
         $content .= "                    table += `</div>`;\n";
         $content .= "                    $('#{$this->tableName}-list').html(table);\n";
         $content .= "                } else {\n";
-        $content .= "                    alert('Error fetching {$this->tableName}.');\n";
+        $content .= "                    showNotification('error', 'Error fetching {$this->tableName}.');\n";
         $content .= "                }\n";
         $content .= "            },\n";
         $content .= "            error: function() {\n";
-        $content .= "                alert('Error fetching {$this->tableName}.');\n";
+        $content .= "                showNotification('error', 'Error fetching {$this->tableName}.');\n";
         $content .= "            }\n";
         $content .= "        });\n";
         $content .= "    }\n\n";
     
-        // Add button to show the form for adding new records
+        // Add button to show the form for adding new records - keeping your original implementation
         $content .= "    $('#add-{$this->tableName}').click(function() {\n";
         $content .= "        $('#{$this->tableName}-form-element')[0].reset();\n";
         $content .= "        $('#form-title').text('Add " . $this->formatTitle($this->tableName) . "');\n";
         $content .= "        $('#{$this->primaryKey}').val('');\n";
+        $content .= "        // Reset select2 dropdowns\n";
+        foreach ($this->foreignKeys as $column => $foreignTable) {
+            $content .= "        $('#{$column}').val(null).trigger('change');\n";
+        }
         $content .= "        $('#{$this->tableName}-form').show();\n";
         $content .= "    });\n\n";
     
-        // Cancel button to hide the form
+        // Cancel button to hide the form - keeping your original implementation
         $content .= "    $('#cancel').click(function() {\n";
         $content .= "        $('#{$this->tableName}-form').hide();\n";
         $content .= "    });\n\n";
     
-        // Form submission logic
+        // Form submission logic - improved with loading indicator
         $content .= "    $('#{$this->tableName}-form-element').submit(function(e) {\n";
         $content .= "        e.preventDefault();\n";
         $content .= "        const formData = new FormData(this);\n";
         $content .= "        formData.append('action', 'save');\n";
+        
+        $content .= "        // Add loading indicator\n";
+        $content .= "        const submitBtn = $(this).find('button[type=\"submit\"]');\n";
+        $content .= "        const originalText = submitBtn.html();\n";
+        $content .= "        submitBtn.html('<span class=\"spinner-border spinner-border-sm me-2\" role=\"status\"></span>Saving...').prop('disabled', true);\n";
+        
         $content .= "        $.ajax({\n";
         $content .= "            url: '../actions/actions_{$this->tableName}.php',\n";
         $content .= "            type: 'POST',\n";
@@ -249,22 +279,27 @@ class CRUDGenerator {
         $content .= "            processData: false,\n";
         $content .= "            contentType: false,\n";
         $content .= "            success: function(response) {\n";
+        $content .= "                // Reset button state\n";
+        $content .= "                submitBtn.html(originalText).prop('disabled', false);\n";
+        $content .= "                \n";
         $content .= "                const data = JSON.parse(response);\n";
         $content .= "                if (data.success) {\n";
-        $content .= "                    alert('" . $this->formatTitle($this->tableName) . " saved successfully.');\n";
+        $content .= "                    showNotification('success', '" . $this->formatTitle($this->tableName) . " saved successfully.');\n";
         $content .= "                    $('#{$this->tableName}-form').hide();\n";
         $content .= "                    fetch{$tableNameCamelCase}();\n";
         $content .= "                } else {\n";
-        $content .= "                    alert('Error saving {$this->tableName}: ' + data.message);\n";
+        $content .= "                    showNotification('error', 'Error saving {$this->tableName}: ' + data.message);\n";
         $content .= "                }\n";
         $content .= "            },\n";
         $content .= "            error: function() {\n";
-        $content .= "                alert('Error saving {$this->tableName}.');\n";
+        $content .= "                // Reset button state\n";
+        $content .= "                submitBtn.html(originalText).prop('disabled', false);\n";
+        $content .= "                showNotification('error', 'Error saving {$this->tableName}.');\n";
         $content .= "            }\n";
         $content .= "        });\n";
         $content .= "    });\n\n";
     
-        // Edit button logic
+        // Edit button logic - keeping your original implementation
         $content .= "    $(document).on('click', '.edit-{$this->tableName}', function() {\n";
         $content .= "        const id = $(this).data('id');\n";
         $content .= "        $.ajax({\n";
@@ -292,19 +327,25 @@ class CRUDGenerator {
         $content .= "                    $('#form-title').text('Edit " . $this->formatTitle($this->tableName) . "');\n";
         $content .= "                    $('#{$this->tableName}-form').show();\n";
         $content .= "                } else {\n";
-        $content .= "                    alert('Error fetching {$this->tableName} details: ' + data.message);\n";
+        $content .= "                    showNotification('error', 'Error fetching {$this->tableName} details: ' + data.message);\n";
         $content .= "                }\n";
         $content .= "            },\n";
         $content .= "            error: function() {\n";
-        $content .= "                alert('Error fetching {$this->tableName} details.');\n";
+        $content .= "                showNotification('error', 'Error fetching {$this->tableName} details.');\n";
         $content .= "            }\n";
         $content .= "        });\n";
         $content .= "    });\n\n";
     
-        // Delete button logic
+        // Delete button logic - improved with loading indicator
         $content .= "    $(document).on('click', '.delete-{$this->tableName}', function() {\n";
         $content .= "        if (!confirm('Are you sure you want to delete this " . $this->formatTitle($this->tableName) . "?')) return;\n";
+        
         $content .= "        const id = $(this).data('id');\n";
+        $content .= "        const button = $(this);\n";
+        $content .= "        \n";
+        $content .= "        // Add loading indicator\n";
+        $content .= "        button.html('<span class=\"spinner-border spinner-border-sm\" role=\"status\"></span>').prop('disabled', true);\n";
+        
         $content .= "        $.ajax({\n";
         $content .= "            url: '../actions/actions_{$this->tableName}.php',\n";
         $content .= "            type: 'POST',\n";
@@ -312,22 +353,28 @@ class CRUDGenerator {
         $content .= "            success: function(response) {\n";
         $content .= "                const data = JSON.parse(response);\n";
         $content .= "                if (data.success) {\n";
-        $content .= "                    alert('" . $this->formatTitle($this->tableName) . " deleted successfully.');\n";
+        $content .= "                    showNotification('success', '" . $this->formatTitle($this->tableName) . " deleted successfully.');\n";
         $content .= "                    fetch{$tableNameCamelCase}();\n";
         $content .= "                } else {\n";
-        $content .= "                    alert('Error deleting " . $this->formatTitle($this->tableName) . ": ' + data.message);\n";
+        $content .= "                    button.html('<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"icon icon-tabler icon-tabler-trash\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke=\"currentColor\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M4 7l16 0\" /><path d=\"M10 11l0 6\" /><path d=\"M14 11l0 6\" /><path d=\"M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12\" /><path d=\"M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3\" /></svg>').prop('disabled', false);\n";
+        $content .= "                    showNotification('error', 'Error deleting " . $this->formatTitle($this->tableName) . ": ' + data.message);\n";
         $content .= "                }\n";
         $content .= "            },\n";
         $content .= "            error: function() {\n";
-        $content .= "                alert('Error deleting {$this->tableName}.');\n";
+        $content .= "                button.html('<svg xmlns=\"http://www.w3.org/2000/svg\" class=\"icon icon-tabler icon-tabler-trash\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" stroke-width=\"2\" stroke=\"currentColor\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path stroke=\"none\" d=\"M0 0h24v24H0z\" fill=\"none\"/><path d=\"M4 7l16 0\" /><path d=\"M10 11l0 6\" /><path d=\"M14 11l0 6\" /><path d=\"M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12\" /><path d=\"M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3\" /></svg>').prop('disabled', false);\n";
+        $content .= "                showNotification('error', 'Error deleting {$this->tableName}.');\n";
         $content .= "            }\n";
         $content .= "        });\n";
         $content .= "    });\n\n";
     
-        // Search functionality
+        // Search functionality with debounce for better performance
+        $content .= "    let searchTimeout;\n";
         $content .= "    $('#search-box').on('input', function() {\n";
+        $content .= "        clearTimeout(searchTimeout);\n";
         $content .= "        const search = $(this).val();\n";
-        $content .= "        fetch{$tableNameCamelCase}(search);\n";
+        $content .= "        searchTimeout = setTimeout(function() {\n";
+        $content .= "            fetch{$tableNameCamelCase}(search);\n";
+        $content .= "        }, 300);\n";
         $content .= "    });\n\n";
     
         // Initial fetch
@@ -338,14 +385,13 @@ class CRUDGenerator {
     }
     
     private function generateActionsPHP() {
-        // Keep the original actions PHP code as it's backend logic and doesn't need UI updates
         $content = "<?php\n";
         $content .= "include('../includes/session.php');\n";
         $content .= "include('../includes/dbconfig.php');\n\n";
         $content .= "\$action = \$_REQUEST['action'];\n\n";
         $content .= "switch (\$action) {\n";
         
-        // FETCH CASE
+        // FETCH CASE - improved with proper SQL parentheses
         $content .= "    case 'fetch':\n";
         $content .= "        if (!check_permission('read_manage_{$this->tableName}')) {\n";
         $content .= "            echo json_encode(['success' => false, 'message' => 'Unauthorized']);\n";
@@ -368,23 +414,30 @@ class CRUDGenerator {
             $content .= "        \$sql .= \"LEFT JOIN {$foreignTable['table']} ON {$this->tableName}.{$column} = {$foreignTable['table']}.{$foreignTable['key']} \";\n";
         }
 
-        // Add WHERE clause for search functionality
+        // Add WHERE clause for search functionality - fixed with proper parentheses
         $content .= "        \$sql .= \"WHERE 1 = 1 \";\n";
-
+        $content .= "        if (!empty(\$search)) {\n";
+        $content .= "            \$sql .= \"AND (\";\n";
+        
         // Add search conditions for the primary table columns
+        $searchConditions = [];
         foreach ($this->columns as $column) {
             if ($column !== $this->primaryKey) {
-                $content .= "        \$sql .= \"AND {$this->tableName}.{$column} LIKE '%\$search%' \";\n";
+                $searchConditions[] = "{$this->tableName}.{$column} LIKE '%\$search%'";
             }
         }
 
         // Add search conditions for the foreign table fields
         foreach ($this->foreignKeys as $column => $foreignTable) {
-            $content .= "        \$sql .= \"OR {$foreignTable['table']}.{$foreignTable['field']} LIKE '%\$search%' \";\n";
+            $searchConditions[] = "{$foreignTable['table']}.{$foreignTable['field']} LIKE '%\$search%'";
         }
+        
+        $content .= "            \$sql .= \"" . implode(" OR ", $searchConditions) . "\";\n";
+        $content .= "            \$sql .= \")\";\n";
+        $content .= "        }\n";
 
         // Order by primary key
-        $content .= "        \$sql .= \"ORDER BY {$this->primaryKey} DESC\";\n";
+        $content .= "        \$sql .= \" ORDER BY {$this->primaryKey} DESC\";\n";
 
         $content .= "        \$result = \$conn->query(\$sql);\n";
         $content .= "        \$data = [];\n";
@@ -425,7 +478,7 @@ class CRUDGenerator {
             }
         }
         $content = rtrim($content, ", \n") . "\n";
-        $content .= "            \$sql .= \"updated_at = NOW() WHERE {$this->primaryKey} = ?\";\n";
+        $content .= "            \$sql .= \", updated_at = NOW() WHERE {$this->primaryKey} = ?\";\n";
         $content .= "            \$stmt = \$conn->prepare(\$sql);\n";
         $types = str_repeat('s', count($this->columns) - 1) . 'i';
         $content .= "            \$stmt->bind_param('{$types}', ";
@@ -493,7 +546,7 @@ class CRUDGenerator {
         $content .= "        }\n\n";
         $content .= "        \$id = \$_GET['id'];\n";
         
-        // Build the join SQL query dynamically
+        // Build the join SQL query dynamically - using LEFT JOIN for safety
         $selectColumns = [];
         $joinClauses = [];
         foreach ($this->columns as $column) {
@@ -502,7 +555,7 @@ class CRUDGenerator {
                 $foreignTable = $this->foreignKeys[$column]['table'];
                 $foreignField = $this->foreignKeys[$column]['field'];
                 $selectColumns[] = "{$foreignTable}.{$foreignField} AS {$foreignField}";
-                $joinClauses[] = "JOIN {$foreignTable} ON {$this->tableName}.{$column} = {$foreignTable}.{$this->foreignKeys[$column]['key']}";
+                $joinClauses[] = "LEFT JOIN {$foreignTable} ON {$this->tableName}.{$column} = {$foreignTable}.{$this->foreignKeys[$column]['key']}";
             }
         }
         $selectColumns = implode(', ', $selectColumns);
@@ -542,7 +595,7 @@ class CRUDGenerator {
             $content .= "            echo json_encode(['success' => false, 'message' => 'Unauthorized']);\n";
             $content .= "            exit();\n";
             $content .= "        }\n\n";
-            $content .= "        \$search = \$_GET['search'];\n";
+            $content .= "        \$search = \$_GET['search'] ?? '';\n";
             $content .= "        \$sql = \"SELECT {$foreignTable['key']} AS id, {$foreignTable['field']} AS text FROM {$foreignTable['table']} WHERE {$foreignTable['field']} LIKE ?\";\n";
             $content .= "        \$stmt = \$conn->prepare(\$sql);\n";
             $content .= "        \$search = \"%{\$search}%\";\n";
@@ -554,28 +607,6 @@ class CRUDGenerator {
             $content .= "            \$items[] = \$row;\n";
             $content .= "        }\n";
             $content .= "        echo json_encode(['items' => \$items]);\n";
-            $content .= "        break;\n";
-        }
-    
-        // GET CASES for foreign keys
-        foreach ($this->foreignKeys as $column => $foreignTable) {
-            $tableName = $foreignTable['table'];
-            $primaryKey = $foreignTable['key'];
-            $field = $foreignTable['field'];
-            
-            $content .= "    case 'get_{$tableName}':\n";
-            $content .= "        if (!check_permission('read_manage_{$this->tableName}')) {\n";
-            $content .= "            echo json_encode(['success' => false, 'message' => 'Unauthorized']);\n";
-            $content .= "            exit();\n";
-            $content .= "        }\n\n";
-            $content .= "        \${$primaryKey} = \$_GET['id'];\n";
-            $content .= "        \$sql = \"SELECT * FROM {$tableName} WHERE {$primaryKey} = ?\";\n";
-            $content .= "        \$stmt = \$conn->prepare(\$sql);\n";
-            $content .= "        \$stmt->bind_param('i', \${$primaryKey});\n";
-            $content .= "        \$stmt->execute();\n";
-            $content .= "        \$result = \$stmt->get_result();\n";
-            $content .= "        \$data = \$result->fetch_assoc();\n";
-            $content .= "        echo json_encode(['success' => true, 'data' => \$data]);\n";
             $content .= "        break;\n";
         }
     

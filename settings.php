@@ -5,8 +5,8 @@
 return [
     'db' => [
         'host' => 'localhost',
-        'dbname' => 'myproject',
-        'user' => 'root',
-        'password' => '',
+        'dbname' => 'myproject_updated',
+        'user' => 'ramabhadrarao',
+        'password' => 'nihita1981',
     ],
 ];

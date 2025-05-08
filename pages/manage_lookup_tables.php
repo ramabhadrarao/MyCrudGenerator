@@ -1,6 +1,6 @@
 <?php
-// Check permission to view manage permissions
-if (!check_permission('read_manage_permissions')) {
+// Check permission to view manage lookup_tables
+if (!check_permission('read_manage_lookup_tables')) {
     set_flash_message('danger', 'You do not have permission to view this page.');
     header('Location: dashboard.php');
     exit();
@@ -9,31 +9,35 @@ if (!check_permission('read_manage_permissions')) {
 
 <div class='card'>
     <div class='card-header'>
-        <h3 class='card-title'>Manage Permissions</h3>
-        <?php if (check_permission('create_manage_permissions')): ?>
+        <h3 class='card-title'>Manage Lookup Tables</h3>
+        <?php if (check_permission('create_manage_lookup_tables')): ?>
         <div class='card-actions'>
-            <button id='add-permissions' class='btn btn-primary'>
+            <button id='add-lookup_tables' class='btn btn-primary'>
                 <svg xmlns='http://www.w3.org/2000/svg' class='icon' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
                     <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
                     <path d='M12 5l0 14' />
                     <path d='M5 12l14 0' />
                 </svg>
-                Add Permissions
+                Add Lookup Tables
             </button>
         </div>
         <?php endif; ?>
     </div>
 
-    <div id='permissions-form' class='card' style='display: none;'>
+    <div id='lookup_tables-form' class='card' style='display: none;'>
         <div class='card-header'>
-            <h3 id='form-title' class='card-title'>Add Permissions</h3>
+            <h3 id='form-title' class='card-title'>Add Lookup Tables</h3>
         </div>
         <div class='card-body'>
-            <form id='permissions-form-element'>
-                <input type='hidden' id='permission_id' name='permission_id'>
+            <form id='lookup_tables-form-element'>
+                <input type='hidden' id='lookup_id' name='lookup_id'>
                 <div class='mb-3'>
-                    <label class='form-label required' for='permission_name'>Permission Name</label>
-                    <input type='text' id='permission_name' name='permission_name' class='form-control' required>
+                    <label class='form-label required' for='lookup_type'>Lookup Type</label>
+                    <input type='text' id='lookup_type' name='lookup_type' class='form-control' required>
+                </div>
+                <div class='mb-3'>
+                    <label class='form-label required' for='lookup_value'>Lookup Value</label>
+                    <input type='text' id='lookup_value' name='lookup_value' class='form-control' required>
                 </div>
                 <div class='d-flex justify-content-between'>
                     <button type='submit' class='btn btn-primary'>Save</button>
@@ -53,14 +57,14 @@ if (!check_permission('read_manage_permissions')) {
                         <path d='M21 21l-6 -6' />
                     </svg>
                 </span>
-                <input type='text' id='search-box' class='form-control' placeholder='Search permissions...'>
+                <input type='text' id='search-box' class='form-control' placeholder='Search lookup tables...'>
             </div>
         </div>
 
-        <div id='permissions-list'></div>
+        <div id='lookup_tables-list'></div>
     </div>
 </div>
 
 <script src='https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js'></script>
 <script src='https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js'></script>
-<script src='../js/manage_permissions.js'></script>
+<script src='../js/manage_lookup_tables.js'></script>

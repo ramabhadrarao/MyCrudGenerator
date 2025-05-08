@@ -1,24 +1,61 @@
+</div>
+        </div>
+        <footer class="footer footer-transparent d-print-none">
+            <div class="container-xl">
+                <div class="row text-center align-items-center flex-row-reverse">
+                    <div class="col-lg-auto ms-lg-auto">
+                        <ul class="list-inline list-inline-dots mb-0">
+                            <li class="list-inline-item"><a href="#" class="link-secondary">Help</a></li>
+                            <li class="list-inline-item"><a href="#" class="link-secondary">Support</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-12 col-lg-auto mt-3 mt-lg-0">
+                        <ul class="list-inline list-inline-dots mb-0">
+                            <li class="list-inline-item">
+                                Admin Panel © 2025
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="#" class="link-secondary">Version 1.0</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+</div>
+
 <?php
 $messages = get_flash_messages();
 if (!empty($messages)): ?>
-    <div class="fixed bottom-0 left-0 right-0 p-4 z-50">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
         <?php foreach ($messages as $type => $msgs): ?>
             <?php foreach ($msgs as $msg): ?>
-                <div class="bg-<?= $type == 'success' ? 'green' : 'red' ?>-100 border border-<?= $type == 'success' ? 'green' : 'red' ?>-400 text-<?= $type == 'success' ? 'green' : 'red' ?>-700 px-4 py-3 rounded relative mb-2 flex items-start sm:items-center transition-all duration-300 ease-in-out transform hover:scale-105" role="alert">
-                    <strong class="font-bold"><?= $type == 'success' ? 'Success!' : 'Error!' ?></strong>
-                    <span class="block sm:inline ml-2"><?= htmlspecialchars($msg) ?></span>
-                    <button class="absolute top-0 bottom-0 right-0 px-4 py-3" onclick="this.parentElement.style.display='none';">
-                        <svg class="fill-current h-6 w-6 text-<?= $type == 'success' ? 'green' : 'red' ?>-500" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                            <title>Close</title>
-                            <path d="M14.348 14.849a1 1 0 01-1.414 0L10 11.414l-2.934 2.935a1 1 0 01-1.415-1.414l2.935-2.934-2.935-2.934a1 1 0 011.414-1.415L10 8.586l2.934-2.935a1 1 0 011.415 1.415L11.414 10l2.934 2.934a1 1 0 010 1.415z"/>
-                        </svg>
-                    </button>
+                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header bg-<?= $type == 'success' ? 'success' : 'danger' ?>">
+                        <strong class="me-auto text-white"><?= $type == 'success' ? 'Success!' : 'Error!' ?></strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body">
+                        <?= htmlspecialchars($msg) ?>
+                    </div>
                 </div>
             <?php endforeach; ?>
         <?php endforeach; ?>
     </div>
 <?php endif; ?>
-<script src="../js/cdn.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.2.2/cdn.js"></script>
+
+<!-- Tabler Core JS -->
+<script src="https://cdn.jsdelivr.net/npm/@tabler/core@latest/dist/js/tabler.min.js"></script>
+
+<!-- jQuery (required for existing scripts) -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+<!-- Select2 (for dropdown enhancement) -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- Additional scripts -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.2.2/dist/cdn.min.js"></script>
 </body>
 </html>

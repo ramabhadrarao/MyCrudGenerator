@@ -1,13 +1,13 @@
 $(document).ready(function() {
-    // Initialize Select2 for user_id
-    $('#user_id').select2({
+    // Initialize Select2 for faculty_id
+    $('#faculty_id').select2({
         ajax: {
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_teaching_activities.php',
             dataType: 'json',
             delay: 250,
             data: function(params) {
                 return {
-                    action: 'search_users',
+                    action: 'search_faculty',
                     search: params.term
                 };
             },
@@ -18,20 +18,20 @@ $(document).ready(function() {
             },
             cache: true
         },
-        placeholder: 'Select Users',
+        placeholder: 'Select Faculty',
         allowClear: true,
         theme: 'bootstrap-5'
     });
 
-    // Initialize Select2 for group_id
-    $('#group_id').select2({
+    // Initialize Select2 for attachment_id
+    $('#attachment_id').select2({
         ajax: {
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_teaching_activities.php',
             dataType: 'json',
             delay: 250,
             data: function(params) {
                 return {
-                    action: 'search_permission_groups',
+                    action: 'search_attachments',
                     search: params.term
                 };
             },
@@ -42,14 +42,14 @@ $(document).ready(function() {
             },
             cache: true
         },
-        placeholder: 'Select Permission Groups',
+        placeholder: 'Select Attachments',
         allowClear: true,
         theme: 'bootstrap-5'
     });
 
-    function fetchUser_permission_groups(search = '') {
+    function fetchTeaching_activities(search = '') {
         $.ajax({
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_teaching_activities.php',
             type: 'GET',
             data: { action: 'fetch', search: search },
             success: function(response) {
@@ -58,20 +58,28 @@ $(document).ready(function() {
                     let table = `<div class='table-responsive'>`;
                     table += `<table class='table table-vcenter card-table'>`;
                     table += `<thead><tr>`;
-                    table += `<th>User Permission Groups Id</th>`;
-                    table += `<th>Username</th>`;
-                    table += `<th>Group Name</th>`;
+                    table += `<th>Activity Id</th>`;
+                    table += `<th>First Name</th>`;
+                    table += `<th>Course Name</th>`;
+                    table += `<th>Semester</th>`;
+                    table += `<th>Year</th>`;
+                    table += `<th>Course Code</th>`;
+                    table += `<th>Visibility</th>`;
                     table += `<th class='w-1'>Actions</th>`;
                     table += `</tr></thead>`;
                     table += `<tbody>`;
                     data.data.forEach(function(item) {
                         table += `<tr>`;
-                        table += `<td>${item.user_permission_groups_id}</td>`;
-                        table += `<td>${item.username}</td>`;
-                        table += `<td>${item.group_name}</td>`;
+                        table += `<td>${item.activity_id}</td>`;
+                        table += `<td>${item.first_name}</td>`;
+                        table += `<td>${item.course_name}</td>`;
+                        table += `<td>${item.semester}</td>`;
+                        table += `<td>${item.year}</td>`;
+                        table += `<td>${item.course_code}</td>`;
+                        table += `<td>${item.visibility}</td>`;
                         table += `<td>`;
                         if (data.permissions.update) {
-                            table += `<button class='btn btn-primary btn-icon btn-sm edit-user_permission_groups' data-id='${item.user_permission_groups_id}'>
+                            table += `<button class='btn btn-primary btn-icon btn-sm edit-teaching_activities' data-id='${item.activity_id}'>
                                 <svg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-edit' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
                                     <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
                                     <path d='M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1' />
@@ -81,7 +89,7 @@ $(document).ready(function() {
                             </button>`;
                         }
                         if (data.permissions.delete) {
-                            table += `<button class='btn btn-danger btn-icon btn-sm ms-1 delete-user_permission_groups' data-id='${item.user_permission_groups_id}'>
+                            table += `<button class='btn btn-danger btn-icon btn-sm ms-1 delete-teaching_activities' data-id='${item.activity_id}'>
                                 <svg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-trash' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
                                     <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
                                     <path d='M4 7l16 0' />
@@ -98,34 +106,34 @@ $(document).ready(function() {
                     table += `</tbody>`;
                     table += `</table>`;
                     table += `</div>`;
-                    $('#user_permission_groups-list').html(table);
+                    $('#teaching_activities-list').html(table);
                 } else {
-                    alert('Error fetching user_permission_groups.');
+                    alert('Error fetching teaching_activities.');
                 }
             },
             error: function() {
-                alert('Error fetching user_permission_groups.');
+                alert('Error fetching teaching_activities.');
             }
         });
     }
 
-    $('#add-user_permission_groups').click(function() {
-        $('#user_permission_groups-form-element')[0].reset();
-        $('#form-title').text('Add User Permission Groups');
-        $('#user_permission_groups_id').val('');
-        $('#user_permission_groups-form').show();
+    $('#add-teaching_activities').click(function() {
+        $('#teaching_activities-form-element')[0].reset();
+        $('#form-title').text('Add Teaching Activities');
+        $('#activity_id').val('');
+        $('#teaching_activities-form').show();
     });
 
     $('#cancel').click(function() {
-        $('#user_permission_groups-form').hide();
+        $('#teaching_activities-form').hide();
     });
 
-    $('#user_permission_groups-form-element').submit(function(e) {
+    $('#teaching_activities-form-element').submit(function(e) {
         e.preventDefault();
         const formData = new FormData(this);
         formData.append('action', 'save');
         $.ajax({
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_teaching_activities.php',
             type: 'POST',
             data: formData,
             processData: false,
@@ -133,70 +141,74 @@ $(document).ready(function() {
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
-                    alert('User Permission Groups saved successfully.');
-                    $('#user_permission_groups-form').hide();
-                    fetchUser_permission_groups();
+                    alert('Teaching Activities saved successfully.');
+                    $('#teaching_activities-form').hide();
+                    fetchTeaching_activities();
                 } else {
-                    alert('Error saving user_permission_groups: ' + data.message);
+                    alert('Error saving teaching_activities: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error saving user_permission_groups.');
+                alert('Error saving teaching_activities.');
             }
         });
     });
 
-    $(document).on('click', '.edit-user_permission_groups', function() {
+    $(document).on('click', '.edit-teaching_activities', function() {
         const id = $(this).data('id');
         $.ajax({
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_teaching_activities.php',
             type: 'GET',
             data: { action: 'get', id: id },
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
                     const item = data.data;
-                    $('#user_id').empty().append(new Option(item.username, item.user_id, false, true)).trigger('change');
-                    $('#group_id').empty().append(new Option(item.group_name, item.group_id, false, true)).trigger('change');
-                    $('#user_permission_groups_id').val(item.user_permission_groups_id);
-                    $('#form-title').text('Edit User Permission Groups');
-                    $('#user_permission_groups-form').show();
+                    $('#faculty_id').empty().append(new Option(item.first_name, item.faculty_id, false, true)).trigger('change');
+                    $('#course_name').val(item.course_name);
+                    $('#semester').val(item.semester);
+                    $('#year').val(item.year);
+                    $('#course_code').val(item.course_code);
+                    $('#visibility').val(item.visibility);
+                    $('#activity_id').val(item.activity_id);
+                    $('#form-title').text('Edit Teaching Activities');
+                    $('#teaching_activities-form').show();
                 } else {
-                    alert('Error fetching user_permission_groups details: ' + data.message);
+                    alert('Error fetching teaching_activities details: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error fetching user_permission_groups details.');
+                alert('Error fetching teaching_activities details.');
             }
         });
     });
 
-    $(document).on('click', '.delete-user_permission_groups', function() {
-        if (!confirm('Are you sure you want to delete this User Permission Groups?')) return;
+    $(document).on('click', '.delete-teaching_activities', function() {
+        if (!confirm('Are you sure you want to delete this Teaching Activities?')) return;
         const id = $(this).data('id');
         $.ajax({
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_teaching_activities.php',
             type: 'POST',
             data: { action: 'delete', id: id },
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
-                    alert('User Permission Groups deleted successfully.');
-                    fetchUser_permission_groups();
+                    alert('Teaching Activities deleted successfully.');
+                    fetchTeaching_activities();
                 } else {
-                    alert('Error deleting User Permission Groups: ' + data.message);
+                    alert('Error deleting Teaching Activities: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error deleting user_permission_groups.');
+                alert('Error deleting teaching_activities.');
             }
         });
     });
 
     $('#search-box').on('input', function() {
         const search = $(this).val();
-        fetchUser_permission_groups(search);
+        fetchTeaching_activities(search);
     });
 
-    fetchUser_permission_groups();
+    fetchTeaching_activities();
 });

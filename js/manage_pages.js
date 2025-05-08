@@ -7,29 +7,47 @@ $(document).ready(function() {
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
-                    let table = `<table class='w-full bg-white rounded shadow-md'>`;
+                    let table = `<div class='table-responsive'>`;
+                    table += `<table class='table table-vcenter card-table'>`;
                     table += `<thead><tr>`;
-                    table += `<th class='border px-4 py-2'>Page id</th>`;
-                    table += `<th class='border px-4 py-2'>Page name</th>`;
-                    table += `<th class='border px-4 py-2'>Actions</th>`;
+                    table += `<th>Page Id</th>`;
+                    table += `<th>Page Name</th>`;
+                    table += `<th class='w-1'>Actions</th>`;
                     table += `</tr></thead>`;
                     table += `<tbody>`;
                     data.data.forEach(function(item) {
                         table += `<tr>`;
-                        table += `<td class='border px-4 py-2'>${item.page_id}</td>`;
-                        table += `<td class='border px-4 py-2'>${item.page_name}</td>`;
-                        table += `<td class='border px-4 py-2'>`;
+                        table += `<td>${item.page_id}</td>`;
+                        table += `<td>${item.page_name}</td>`;
+                        table += `<td>`;
                         if (data.permissions.update) {
-                            table += `<button class='bg-blue-500 text-white px-2 py-1 rounded edit-pages' data-id='${item.page_id}'>Edit</button>`;
+                            table += `<button class='btn btn-primary btn-icon btn-sm edit-pages' data-id='${item.page_id}'>
+                                <svg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-edit' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
+                                    <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
+                                    <path d='M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1' />
+                                    <path d='M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z' />
+                                    <path d='M16 5l3 3' />
+                                </svg>
+                            </button>`;
                         }
                         if (data.permissions.delete) {
-                            table += `<button class='bg-red-500 text-white px-2 py-1 rounded delete-pages' data-id='${item.page_id}'>Delete</button>`;
+                            table += `<button class='btn btn-danger btn-icon btn-sm ms-1 delete-pages' data-id='${item.page_id}'>
+                                <svg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-trash' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
+                                    <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
+                                    <path d='M4 7l16 0' />
+                                    <path d='M10 11l0 6' />
+                                    <path d='M14 11l0 6' />
+                                    <path d='M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12' />
+                                    <path d='M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3' />
+                                </svg>
+                            </button>`;
                         }
                         table += `</td>`;
                         table += `</tr>`;
                     });
                     table += `</tbody>`;
                     table += `</table>`;
+                    table += `</div>`;
                     $('#pages-list').html(table);
                 } else {
                     alert('Error fetching pages.');
@@ -45,11 +63,11 @@ $(document).ready(function() {
         $('#pages-form-element')[0].reset();
         $('#form-title').text('Add Pages');
         $('#page_id').val('');
-        $('#pages-form').removeClass('hidden');
+        $('#pages-form').show();
     });
 
     $('#cancel').click(function() {
-        $('#pages-form').addClass('hidden');
+        $('#pages-form').hide();
     });
 
     $('#pages-form-element').submit(function(e) {
@@ -66,7 +84,7 @@ $(document).ready(function() {
                 const data = JSON.parse(response);
                 if (data.success) {
                     alert('Pages saved successfully.');
-                    $('#pages-form').addClass('hidden');
+                    $('#pages-form').hide();
                     fetchPages();
                 } else {
                     alert('Error saving pages: ' + data.message);
@@ -91,7 +109,7 @@ $(document).ready(function() {
                     $('#page_name').val(item.page_name);
                     $('#page_id').val(item.page_id);
                     $('#form-title').text('Edit Pages');
-                    $('#pages-form').removeClass('hidden');
+                    $('#pages-form').show();
                 } else {
                     alert('Error fetching pages details: ' + data.message);
                 }

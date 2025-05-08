@@ -14,7 +14,7 @@ function downloadCRUDGenerator() {
         mkdir($generatorDir, 0755, true);
     }
     $filePath = $generatorDir . "/CRUDGeneratorv9.php";
-    file_put_contents($filePath, file_get_contents($url));
+    //file_put_contents($filePath, file_get_contents($url));
     require_once $filePath;
 }
 

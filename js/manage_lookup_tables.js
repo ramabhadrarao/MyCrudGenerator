@@ -1,7 +1,7 @@
 $(document).ready(function() {
-    function fetchMenu(search = '') {
+    function fetchLookup_tables(search = '') {
         $.ajax({
-            url: '../actions/actions_menu.php',
+            url: '../actions/actions_lookup_tables.php',
             type: 'GET',
             data: { action: 'fetch', search: search },
             success: function(response) {
@@ -10,18 +10,20 @@ $(document).ready(function() {
                     let table = `<div class='table-responsive'>`;
                     table += `<table class='table table-vcenter card-table'>`;
                     table += `<thead><tr>`;
-                    table += `<th>Menu Id</th>`;
-                    table += `<th>Menu Name</th>`;
+                    table += `<th>Lookup Id</th>`;
+                    table += `<th>Lookup Type</th>`;
+                    table += `<th>Lookup Value</th>`;
                     table += `<th class='w-1'>Actions</th>`;
                     table += `</tr></thead>`;
                     table += `<tbody>`;
                     data.data.forEach(function(item) {
                         table += `<tr>`;
-                        table += `<td>${item.menu_id}</td>`;
-                        table += `<td>${item.menu_name}</td>`;
+                        table += `<td>${item.lookup_id}</td>`;
+                        table += `<td>${item.lookup_type}</td>`;
+                        table += `<td>${item.lookup_value}</td>`;
                         table += `<td>`;
                         if (data.permissions.update) {
-                            table += `<button class='btn btn-primary btn-icon btn-sm edit-menu' data-id='${item.menu_id}'>
+                            table += `<button class='btn btn-primary btn-icon btn-sm edit-lookup_tables' data-id='${item.lookup_id}'>
                                 <svg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-edit' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
                                     <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
                                     <path d='M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1' />
@@ -31,7 +33,7 @@ $(document).ready(function() {
                             </button>`;
                         }
                         if (data.permissions.delete) {
-                            table += `<button class='btn btn-danger btn-icon btn-sm ms-1 delete-menu' data-id='${item.menu_id}'>
+                            table += `<button class='btn btn-danger btn-icon btn-sm ms-1 delete-lookup_tables' data-id='${item.lookup_id}'>
                                 <svg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-trash' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
                                     <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
                                     <path d='M4 7l16 0' />
@@ -48,34 +50,34 @@ $(document).ready(function() {
                     table += `</tbody>`;
                     table += `</table>`;
                     table += `</div>`;
-                    $('#menu-list').html(table);
+                    $('#lookup_tables-list').html(table);
                 } else {
-                    alert('Error fetching menu.');
+                    alert('Error fetching lookup_tables.');
                 }
             },
             error: function() {
-                alert('Error fetching menu.');
+                alert('Error fetching lookup_tables.');
             }
         });
     }
 
-    $('#add-menu').click(function() {
-        $('#menu-form-element')[0].reset();
-        $('#form-title').text('Add Menu');
-        $('#menu_id').val('');
-        $('#menu-form').show();
+    $('#add-lookup_tables').click(function() {
+        $('#lookup_tables-form-element')[0].reset();
+        $('#form-title').text('Add Lookup Tables');
+        $('#lookup_id').val('');
+        $('#lookup_tables-form').show();
     });
 
     $('#cancel').click(function() {
-        $('#menu-form').hide();
+        $('#lookup_tables-form').hide();
     });
 
-    $('#menu-form-element').submit(function(e) {
+    $('#lookup_tables-form-element').submit(function(e) {
         e.preventDefault();
         const formData = new FormData(this);
         formData.append('action', 'save');
         $.ajax({
-            url: '../actions/actions_menu.php',
+            url: '../actions/actions_lookup_tables.php',
             type: 'POST',
             data: formData,
             processData: false,
@@ -83,69 +85,70 @@ $(document).ready(function() {
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
-                    alert('Menu saved successfully.');
-                    $('#menu-form').hide();
-                    fetchMenu();
+                    alert('Lookup Tables saved successfully.');
+                    $('#lookup_tables-form').hide();
+                    fetchLookup_tables();
                 } else {
-                    alert('Error saving menu: ' + data.message);
+                    alert('Error saving lookup_tables: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error saving menu.');
+                alert('Error saving lookup_tables.');
             }
         });
     });
 
-    $(document).on('click', '.edit-menu', function() {
+    $(document).on('click', '.edit-lookup_tables', function() {
         const id = $(this).data('id');
         $.ajax({
-            url: '../actions/actions_menu.php',
+            url: '../actions/actions_lookup_tables.php',
             type: 'GET',
             data: { action: 'get', id: id },
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
                     const item = data.data;
-                    $('#menu_name').val(item.menu_name);
-                    $('#menu_id').val(item.menu_id);
-                    $('#form-title').text('Edit Menu');
-                    $('#menu-form').show();
+                    $('#lookup_type').val(item.lookup_type);
+                    $('#lookup_value').val(item.lookup_value);
+                    $('#lookup_id').val(item.lookup_id);
+                    $('#form-title').text('Edit Lookup Tables');
+                    $('#lookup_tables-form').show();
                 } else {
-                    alert('Error fetching menu details: ' + data.message);
+                    alert('Error fetching lookup_tables details: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error fetching menu details.');
+                alert('Error fetching lookup_tables details.');
             }
         });
     });
 
-    $(document).on('click', '.delete-menu', function() {
-        if (!confirm('Are you sure you want to delete this Menu?')) return;
+    $(document).on('click', '.delete-lookup_tables', function() {
+        if (!confirm('Are you sure you want to delete this Lookup Tables?')) return;
         const id = $(this).data('id');
         $.ajax({
-            url: '../actions/actions_menu.php',
+            url: '../actions/actions_lookup_tables.php',
             type: 'POST',
             data: { action: 'delete', id: id },
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
-                    alert('Menu deleted successfully.');
-                    fetchMenu();
+                    alert('Lookup Tables deleted successfully.');
+                    fetchLookup_tables();
                 } else {
-                    alert('Error deleting Menu: ' + data.message);
+                    alert('Error deleting Lookup Tables: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error deleting menu.');
+                alert('Error deleting lookup_tables.');
             }
         });
     });
 
     $('#search-box').on('input', function() {
         const search = $(this).val();
-        fetchMenu(search);
+        fetchLookup_tables(search);
     });
 
-    fetchMenu();
+    fetchLookup_tables();
 });

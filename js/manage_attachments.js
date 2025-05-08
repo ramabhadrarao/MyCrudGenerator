@@ -1,7 +1,7 @@
 $(document).ready(function() {
-    function fetchMenu(search = '') {
+    function fetchAttachments(search = '') {
         $.ajax({
-            url: '../actions/actions_menu.php',
+            url: '../actions/actions_attachments.php',
             type: 'GET',
             data: { action: 'fetch', search: search },
             success: function(response) {
@@ -10,18 +10,22 @@ $(document).ready(function() {
                     let table = `<div class='table-responsive'>`;
                     table += `<table class='table table-vcenter card-table'>`;
                     table += `<thead><tr>`;
-                    table += `<th>Menu Id</th>`;
-                    table += `<th>Menu Name</th>`;
+                    table += `<th>Attachment Id</th>`;
+                    table += `<th>File Path</th>`;
+                    table += `<th>Attachment Type</th>`;
+                    table += `<th>Visibility</th>`;
                     table += `<th class='w-1'>Actions</th>`;
                     table += `</tr></thead>`;
                     table += `<tbody>`;
                     data.data.forEach(function(item) {
                         table += `<tr>`;
-                        table += `<td>${item.menu_id}</td>`;
-                        table += `<td>${item.menu_name}</td>`;
+                        table += `<td>${item.attachment_id}</td>`;
+                        table += `<td>${item.file_path}</td>`;
+                        table += `<td>${item.attachment_type}</td>`;
+                        table += `<td>${item.visibility}</td>`;
                         table += `<td>`;
                         if (data.permissions.update) {
-                            table += `<button class='btn btn-primary btn-icon btn-sm edit-menu' data-id='${item.menu_id}'>
+                            table += `<button class='btn btn-primary btn-icon btn-sm edit-attachments' data-id='${item.attachment_id}'>
                                 <svg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-edit' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
                                     <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
                                     <path d='M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1' />
@@ -31,7 +35,7 @@ $(document).ready(function() {
                             </button>`;
                         }
                         if (data.permissions.delete) {
-                            table += `<button class='btn btn-danger btn-icon btn-sm ms-1 delete-menu' data-id='${item.menu_id}'>
+                            table += `<button class='btn btn-danger btn-icon btn-sm ms-1 delete-attachments' data-id='${item.attachment_id}'>
                                 <svg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-trash' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
                                     <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
                                     <path d='M4 7l16 0' />
@@ -48,34 +52,34 @@ $(document).ready(function() {
                     table += `</tbody>`;
                     table += `</table>`;
                     table += `</div>`;
-                    $('#menu-list').html(table);
+                    $('#attachments-list').html(table);
                 } else {
-                    alert('Error fetching menu.');
+                    alert('Error fetching attachments.');
                 }
             },
             error: function() {
-                alert('Error fetching menu.');
+                alert('Error fetching attachments.');
             }
         });
     }
 
-    $('#add-menu').click(function() {
-        $('#menu-form-element')[0].reset();
-        $('#form-title').text('Add Menu');
-        $('#menu_id').val('');
-        $('#menu-form').show();
+    $('#add-attachments').click(function() {
+        $('#attachments-form-element')[0].reset();
+        $('#form-title').text('Add Attachments');
+        $('#attachment_id').val('');
+        $('#attachments-form').show();
     });
 
     $('#cancel').click(function() {
-        $('#menu-form').hide();
+        $('#attachments-form').hide();
     });
 
-    $('#menu-form-element').submit(function(e) {
+    $('#attachments-form-element').submit(function(e) {
         e.preventDefault();
         const formData = new FormData(this);
         formData.append('action', 'save');
         $.ajax({
-            url: '../actions/actions_menu.php',
+            url: '../actions/actions_attachments.php',
             type: 'POST',
             data: formData,
             processData: false,
@@ -83,69 +87,71 @@ $(document).ready(function() {
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
-                    alert('Menu saved successfully.');
-                    $('#menu-form').hide();
-                    fetchMenu();
+                    alert('Attachments saved successfully.');
+                    $('#attachments-form').hide();
+                    fetchAttachments();
                 } else {
-                    alert('Error saving menu: ' + data.message);
+                    alert('Error saving attachments: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error saving menu.');
+                alert('Error saving attachments.');
             }
         });
     });
 
-    $(document).on('click', '.edit-menu', function() {
+    $(document).on('click', '.edit-attachments', function() {
         const id = $(this).data('id');
         $.ajax({
-            url: '../actions/actions_menu.php',
+            url: '../actions/actions_attachments.php',
             type: 'GET',
             data: { action: 'get', id: id },
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
                     const item = data.data;
-                    $('#menu_name').val(item.menu_name);
-                    $('#menu_id').val(item.menu_id);
-                    $('#form-title').text('Edit Menu');
-                    $('#menu-form').show();
+                    $('#file_path').val(item.file_path);
+                    $('#attachment_type').val(item.attachment_type);
+                    $('#visibility').val(item.visibility);
+                    $('#attachment_id').val(item.attachment_id);
+                    $('#form-title').text('Edit Attachments');
+                    $('#attachments-form').show();
                 } else {
-                    alert('Error fetching menu details: ' + data.message);
+                    alert('Error fetching attachments details: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error fetching menu details.');
+                alert('Error fetching attachments details.');
             }
         });
     });
 
-    $(document).on('click', '.delete-menu', function() {
-        if (!confirm('Are you sure you want to delete this Menu?')) return;
+    $(document).on('click', '.delete-attachments', function() {
+        if (!confirm('Are you sure you want to delete this Attachments?')) return;
         const id = $(this).data('id');
         $.ajax({
-            url: '../actions/actions_menu.php',
+            url: '../actions/actions_attachments.php',
             type: 'POST',
             data: { action: 'delete', id: id },
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
-                    alert('Menu deleted successfully.');
-                    fetchMenu();
+                    alert('Attachments deleted successfully.');
+                    fetchAttachments();
                 } else {
-                    alert('Error deleting Menu: ' + data.message);
+                    alert('Error deleting Attachments: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error deleting menu.');
+                alert('Error deleting attachments.');
             }
         });
     });
 
     $('#search-box').on('input', function() {
         const search = $(this).val();
-        fetchMenu(search);
+        fetchAttachments(search);
     });
 
-    fetchMenu();
+    fetchAttachments();
 });

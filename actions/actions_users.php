@@ -39,7 +39,7 @@ switch ($action) {
 
         $id = $_POST['user_id'] ?? '';
         $username = $_POST['username'];
-        $password = $_POST['password'];
+        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
         $role_id = $_POST['role_id'];
 
         if ($id) {

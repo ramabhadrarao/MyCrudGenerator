@@ -1,13 +1,13 @@
 $(document).ready(function() {
-    // Initialize Select2 for user_id
-    $('#user_id').select2({
+    // Initialize Select2 for faculty_id
+    $('#faculty_id').select2({
         ajax: {
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_research_publications.php',
             dataType: 'json',
             delay: 250,
             data: function(params) {
                 return {
-                    action: 'search_users',
+                    action: 'search_faculty',
                     search: params.term
                 };
             },
@@ -18,20 +18,20 @@ $(document).ready(function() {
             },
             cache: true
         },
-        placeholder: 'Select Users',
+        placeholder: 'Select Faculty',
         allowClear: true,
         theme: 'bootstrap-5'
     });
 
-    // Initialize Select2 for group_id
-    $('#group_id').select2({
+    // Initialize Select2 for type_id
+    $('#type_id').select2({
         ajax: {
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_research_publications.php',
             dataType: 'json',
             delay: 250,
             data: function(params) {
                 return {
-                    action: 'search_permission_groups',
+                    action: 'search_lookup_tables',
                     search: params.term
                 };
             },
@@ -42,14 +42,38 @@ $(document).ready(function() {
             },
             cache: true
         },
-        placeholder: 'Select Permission Groups',
+        placeholder: 'Select Lookup Tables',
         allowClear: true,
         theme: 'bootstrap-5'
     });
 
-    function fetchUser_permission_groups(search = '') {
+    // Initialize Select2 for attachment_id
+    $('#attachment_id').select2({
+        ajax: {
+            url: '../actions/actions_research_publications.php',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    action: 'search_attachments',
+                    search: params.term
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: data.items
+                };
+            },
+            cache: true
+        },
+        placeholder: 'Select Attachments',
+        allowClear: true,
+        theme: 'bootstrap-5'
+    });
+
+    function fetchResearch_publications(search = '') {
         $.ajax({
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_research_publications.php',
             type: 'GET',
             data: { action: 'fetch', search: search },
             success: function(response) {
@@ -58,20 +82,30 @@ $(document).ready(function() {
                     let table = `<div class='table-responsive'>`;
                     table += `<table class='table table-vcenter card-table'>`;
                     table += `<thead><tr>`;
-                    table += `<th>User Permission Groups Id</th>`;
-                    table += `<th>Username</th>`;
-                    table += `<th>Group Name</th>`;
+                    table += `<th>Publication Id</th>`;
+                    table += `<th>First Name</th>`;
+                    table += `<th>Title</th>`;
+                    table += `<th>Journal Name</th>`;
+                    table += `<th>Lookup Value</th>`;
+                    table += `<th>Publication Date</th>`;
+                    table += `<th>Doi</th>`;
+                    table += `<th>Visibility</th>`;
                     table += `<th class='w-1'>Actions</th>`;
                     table += `</tr></thead>`;
                     table += `<tbody>`;
                     data.data.forEach(function(item) {
                         table += `<tr>`;
-                        table += `<td>${item.user_permission_groups_id}</td>`;
-                        table += `<td>${item.username}</td>`;
-                        table += `<td>${item.group_name}</td>`;
+                        table += `<td>${item.publication_id}</td>`;
+                        table += `<td>${item.first_name}</td>`;
+                        table += `<td>${item.title}</td>`;
+                        table += `<td>${item.journal_name}</td>`;
+                        table += `<td>${item.lookup_value}</td>`;
+                        table += `<td>${item.publication_date}</td>`;
+                        table += `<td>${item.doi}</td>`;
+                        table += `<td>${item.visibility}</td>`;
                         table += `<td>`;
                         if (data.permissions.update) {
-                            table += `<button class='btn btn-primary btn-icon btn-sm edit-user_permission_groups' data-id='${item.user_permission_groups_id}'>
+                            table += `<button class='btn btn-primary btn-icon btn-sm edit-research_publications' data-id='${item.publication_id}'>
                                 <svg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-edit' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
                                     <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
                                     <path d='M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1' />
@@ -81,7 +115,7 @@ $(document).ready(function() {
                             </button>`;
                         }
                         if (data.permissions.delete) {
-                            table += `<button class='btn btn-danger btn-icon btn-sm ms-1 delete-user_permission_groups' data-id='${item.user_permission_groups_id}'>
+                            table += `<button class='btn btn-danger btn-icon btn-sm ms-1 delete-research_publications' data-id='${item.publication_id}'>
                                 <svg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-trash' width='24' height='24' viewBox='0 0 24 24' stroke-width='2' stroke='currentColor' fill='none' stroke-linecap='round' stroke-linejoin='round'>
                                     <path stroke='none' d='M0 0h24v24H0z' fill='none'/>
                                     <path d='M4 7l16 0' />
@@ -98,34 +132,34 @@ $(document).ready(function() {
                     table += `</tbody>`;
                     table += `</table>`;
                     table += `</div>`;
-                    $('#user_permission_groups-list').html(table);
+                    $('#research_publications-list').html(table);
                 } else {
-                    alert('Error fetching user_permission_groups.');
+                    alert('Error fetching research_publications.');
                 }
             },
             error: function() {
-                alert('Error fetching user_permission_groups.');
+                alert('Error fetching research_publications.');
             }
         });
     }
 
-    $('#add-user_permission_groups').click(function() {
-        $('#user_permission_groups-form-element')[0].reset();
-        $('#form-title').text('Add User Permission Groups');
-        $('#user_permission_groups_id').val('');
-        $('#user_permission_groups-form').show();
+    $('#add-research_publications').click(function() {
+        $('#research_publications-form-element')[0].reset();
+        $('#form-title').text('Add Research Publications');
+        $('#publication_id').val('');
+        $('#research_publications-form').show();
     });
 
     $('#cancel').click(function() {
-        $('#user_permission_groups-form').hide();
+        $('#research_publications-form').hide();
     });
 
-    $('#user_permission_groups-form-element').submit(function(e) {
+    $('#research_publications-form-element').submit(function(e) {
         e.preventDefault();
         const formData = new FormData(this);
         formData.append('action', 'save');
         $.ajax({
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_research_publications.php',
             type: 'POST',
             data: formData,
             processData: false,
@@ -133,70 +167,75 @@ $(document).ready(function() {
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
-                    alert('User Permission Groups saved successfully.');
-                    $('#user_permission_groups-form').hide();
-                    fetchUser_permission_groups();
+                    alert('Research Publications saved successfully.');
+                    $('#research_publications-form').hide();
+                    fetchResearch_publications();
                 } else {
-                    alert('Error saving user_permission_groups: ' + data.message);
+                    alert('Error saving research_publications: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error saving user_permission_groups.');
+                alert('Error saving research_publications.');
             }
         });
     });
 
-    $(document).on('click', '.edit-user_permission_groups', function() {
+    $(document).on('click', '.edit-research_publications', function() {
         const id = $(this).data('id');
         $.ajax({
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_research_publications.php',
             type: 'GET',
             data: { action: 'get', id: id },
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
                     const item = data.data;
-                    $('#user_id').empty().append(new Option(item.username, item.user_id, false, true)).trigger('change');
-                    $('#group_id').empty().append(new Option(item.group_name, item.group_id, false, true)).trigger('change');
-                    $('#user_permission_groups_id').val(item.user_permission_groups_id);
-                    $('#form-title').text('Edit User Permission Groups');
-                    $('#user_permission_groups-form').show();
+                    $('#faculty_id').empty().append(new Option(item.first_name, item.faculty_id, false, true)).trigger('change');
+                    $('#title').val(item.title);
+                    $('#journal_name').val(item.journal_name);
+                    $('#type_id').empty().append(new Option(item.lookup_value, item.type_id, false, true)).trigger('change');
+                    $('#publication_date').val(item.publication_date);
+                    $('#doi').val(item.doi);
+                    $('#visibility').val(item.visibility);
+                    $('#publication_id').val(item.publication_id);
+                    $('#form-title').text('Edit Research Publications');
+                    $('#research_publications-form').show();
                 } else {
-                    alert('Error fetching user_permission_groups details: ' + data.message);
+                    alert('Error fetching research_publications details: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error fetching user_permission_groups details.');
+                alert('Error fetching research_publications details.');
             }
         });
     });
 
-    $(document).on('click', '.delete-user_permission_groups', function() {
-        if (!confirm('Are you sure you want to delete this User Permission Groups?')) return;
+    $(document).on('click', '.delete-research_publications', function() {
+        if (!confirm('Are you sure you want to delete this Research Publications?')) return;
         const id = $(this).data('id');
         $.ajax({
-            url: '../actions/actions_user_permission_groups.php',
+            url: '../actions/actions_research_publications.php',
             type: 'POST',
             data: { action: 'delete', id: id },
             success: function(response) {
                 const data = JSON.parse(response);
                 if (data.success) {
-                    alert('User Permission Groups deleted successfully.');
-                    fetchUser_permission_groups();
+                    alert('Research Publications deleted successfully.');
+                    fetchResearch_publications();
                 } else {
-                    alert('Error deleting User Permission Groups: ' + data.message);
+                    alert('Error deleting Research Publications: ' + data.message);
                 }
             },
             error: function() {
-                alert('Error deleting user_permission_groups.');
+                alert('Error deleting research_publications.');
             }
         });
     });
 
     $('#search-box').on('input', function() {
         const search = $(this).val();
-        fetchUser_permission_groups(search);
+        fetchResearch_publications(search);
     });
 
-    fetchUser_permission_groups();
+    fetchResearch_publications();
 });
